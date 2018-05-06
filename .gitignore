@@ -1,0 +1,3 @@
+# Para todos os arquivos e sub-pastas localizados na pasta vendor/
+source/.idea
+source/.venv
