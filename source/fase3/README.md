@@ -3,8 +3,6 @@ PyRace
 
 Navigate the streets, collecting pink trophies. Using Python 3.6.3 with PyGame, Written 2012.
 
-Check out the amazing gameplay: [YouTube](https://www.youtube.com/watch?v=qeH_a2uWX2Y&lc=z22csz2zjmjttphwr04t1aokguyhrl0rts2b5fheunvkrk0h00410)
-
 ## Getting started
 The things you need to load the game up:
 1. [Python 3.3+](https://www.python.org/downloads/)
