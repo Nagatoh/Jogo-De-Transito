@@ -22,10 +22,13 @@
 
 #Camera module will keep track of sprite offset.
 
-#Player module, the car.
-import os, sys, pygame, math, maps
-from pygame.locals import *
+import math
 from random import randint
+
+import pygame
+
+# Player module, the car.
+import maps
 from loader import load_image
 
 GRASS_SPEED = 0.715
@@ -72,6 +75,7 @@ class Player(pygame.sprite.Sprite):
         self.softening = 0.04
         self.steering = 1.60
         self.tracks = False
+        self.celular = False
 #Reset the car.
     def reset(self):
         self.x =  int(pygame.display.Info().current_w /2)
@@ -85,14 +89,23 @@ class Player(pygame.sprite.Sprite):
 #Emit tracks..
     def emit_tracks(self):
         self.tracks = True
+
+    def emit_cel(self):
+            self.celular = True
+
         
 #Don't emit tracks..
     def reset_tracks(self):
         self.tracks = False
 
+    def reset_cel(self):
+        self.celular = False
+
 #If the car is on grass, decrease speed and emit tracks.
     def grass(self, value):
         if value > GRASS_GREEN:
+            if self.speed == 0:
+                self.reset_cel()
             if self.speed - self.deacceleration > GRASS_SPEED * 2:
                 self.speed = self.speed - self.deacceleration * 2
                 self.emit_tracks()
@@ -120,7 +133,6 @@ class Player(pygame.sprite.Sprite):
         if self.speed > self.minspeed:
             self.speed = self.speed - self.deacceleration
             self.emit_tracks()
-
 #Steer.
     def steerleft(self):
         self.dir = self.dir+self.steering
@@ -144,6 +156,10 @@ class Player(pygame.sprite.Sprite):
         self.x = self.x + self.speed * math.cos(math.radians(270-self.dir))
         self.y = self.y + self.speed * math.sin(math.radians(270-self.dir))
         self.reset_tracks()
+        self.reset_cel()
+
+
+
         
 
 

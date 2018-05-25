@@ -1,12 +1,16 @@
-
-import pygame
-from pygame.locals import *
-from sys import exit
-import os
-from math import *
 import time
+
 from functions import *
 from loader import load_image
+
+CENTER_X = -1
+CENTER_Y = -1
+NOTE_HALF_X = 211
+NOTE_HALF_Y = 112
+GRASS_GREEN = 75
+
+
+
 
 class Chronometer:
 
@@ -45,8 +49,8 @@ class Chronometer:
 class Semaforo:
 
     def __init__(self, seconds):
-        'self.images = load_image2(semaforo.png, 2, [((x, 0), (94, 140)) \
-                                                     for x in xrange(0, 188, 94)])'
+        self.images = load_image2('semaforo.png', 2, [((x, 0), (94, 140)) \
+                                                     for x in xrange(0, 188, 94)])
         self.image = load_image('semaforo.png')
         self.rect = self.image.get_rect()
         #self.image = self.images[0]
@@ -70,3 +74,97 @@ class Semaforo:
     def show(self):
         if not self.finished:
             self.screen.blit(self.image, self.pos)
+
+
+
+
+
+def rot_center(image, rect, angle):
+    """rotate an image while keeping its center"""
+    rot_image = pygame.transform.rotate(image, angle)
+    rot_rect = rot_image.get_rect(center=rect.center)
+    return rot_image, rot_rect
+
+
+
+
+class CelularAlert(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = load_image('celular.png')
+        self.screen = pygame.display.get_surface()
+        self.rect = self.image.get_rect()
+        self.x = 900
+        self.y = 550
+        self.rect.topleft = self.x, self.y
+        self.chron = Chronometer()
+        self.chron.start(7.5)
+        self.chron.set_time()
+        self.visibility = False
+        self.score = False
+        self.atender = False
+
+    # Se o carro estiver em cima da grama o contador for maior q zero e pressionar Z  = score+5.
+    def grass(self, value, speed):
+        if value > GRASS_GREEN:
+            if speed <= 0.03 and self.visibility is True and self.chron.seconds > 0 and self.atender == True:
+                self.visibility = False
+                self.atender = False
+                print 'aqui'
+                self.score = True
+
+
+            if self.chron.seconds == 0:
+                self.score = False
+                self.visibility = False
+                print 'ali'
+
+    def cel_time(self):
+        self.chron.run()
+        if self.chron.seconds > 0:
+            print 'Tsegundos' + str(self.chron.seconds)
+            return True
+        else:
+            print 'Fsegundos' + str(self.chron.seconds)
+            return False
+
+class StopAlert(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = load_image('stop.png')
+        self.screen = pygame.display.get_surface()
+        self.rect = self.image.get_rect()
+        self.x = 550
+        self.y = 550
+        self.rect.topleft = self.x, self.y
+        self.chron = Chronometer()
+        self.chron.start(7.5)
+        self.chron.set_time()
+        self.visibility = False
+        self.score = False
+
+    # Se o Carro Atingir velocidade 0 score +2
+    def stop_car(self, speed):
+        if speed <= 0.00 and self.visibility is True and self.chron.seconds > 0:
+            self.visibility = False
+            print 'aqui'
+            self.score = True
+
+        if self.chron.seconds == 0:
+            self.score = False
+            self.visibility = False
+            print 'ali'
+
+    def stop_time(self):
+        self.chron.run()
+        if self.chron.seconds > 0:
+            print 'Tsegundos' + str(self.chron.seconds)
+            return True
+        else:
+            print 'Fsegundos' + str(self.chron.seconds)
+            return False
+
+
+
+
+

@@ -22,11 +22,10 @@
 
 #Camera module will keep track of sprite offset.
 
-#Menu and game description.
-from loader import load_image
 import pygame
-from pygame.locals import *
 
+# Menu and game description.
+from loader import load_image
 
 BOUND_MIN = 0
 BOUND_MAX = 1000 * 10
@@ -45,5 +44,3 @@ class Alert(pygame.sprite.Sprite):
         self.rect.topleft = self.x, self.y
         self.visibility = True
 
-
-    

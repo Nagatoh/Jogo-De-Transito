@@ -1,35 +1,45 @@
-#The MIT License (MIT)
+# The MIT License (MIT)
 
-#Copyright (c) 2012 Robin Duda, (chilimannen)
+# Copyright (c) 2012 Robin Duda, (chilimannen)
 
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 
-#The above copyright notice and this permission notice shall be included in
-#all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-#THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
-#Camera module will keep track of sprite offset.
+# Camera module will keep track of sprite offset.
 
-import os, sys, pygame, random, array, gamemode
-import direction,  bounds, timeout, menu
+import sys
+
+import pygame
 from pygame.locals import *
 
-#Import game modules.
+import bounds
+import camera
+import direction
+import gamemode
+import leis_transito
+import maps
+import menu
+import player
+import timeout
+import tracks
+import traffic
+# Import game modules.
 from loader import load_image
-import player, maps, traffic, camera, tracks, leis_transito
-
 
 TRAFFIC_COUNT = 45
 CENTER_W = -1
@@ -47,11 +57,16 @@ def main():
     target = gamemode.Finish()
     bound_alert = bounds.Alert()
     time_alert = timeout.Alert()
+    celular_alert = leis_transito.CelularAlert()
+    stop_alert = leis_transito.StopAlert()
     info = menu.Alert()
     pointer = direction.Tracker(int(CENTER_W * 2), int(CENTER_H * 2))
+
 #create sprite groups.
     map_s     = pygame.sprite.Group()
     player_s  = pygame.sprite.Group()
+    celular_s = pygame.sprite.Group()
+    stop_s = pygame.sprite.Group()
     traffic_s = pygame.sprite.Group()
     tracks_s  = pygame.sprite.Group()
     target_s  = pygame.sprite.Group()
@@ -76,6 +91,9 @@ def main():
 #load alerts
     timer_alert_s.add(time_alert)
     bound_alert_s.add(bound_alert)
+    celular_s.add(celular_alert)
+    stop_s.add(stop_alert)
+
     menu_alert_s.add(info)
 #load traffic
     traffic.initialize(CENTER_W, CENTER_H)
@@ -104,6 +122,9 @@ def main():
                 if (keys[K_q]):
                     pygame.quit()
                     sys.exit(0)
+                if (keys[K_z]):  # atende ligacao
+                    celular_alert.atender = True
+                    print celular_alert.atender
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
@@ -122,6 +143,7 @@ def main():
                 car.soften()
             if keys[K_DOWN]:
                 car.deaccelerate()
+
 
         cam.set_pos(car.x, car.y)
 
@@ -145,15 +167,22 @@ def main():
         
 #Conditional renders/effects
         car.grass(screen.get_at(((int(CENTER_W-5), int(CENTER_H-5)))).g)
-        if (car.tracks):
+        if car.tracks:
             tracks_s.add(tracks.Track(cam.x + CENTER_W, cam.y + CENTER_H, car.dir))
+
+
+
+
 
 #Just render..
         tracks_s.update(cam.x, cam.y)
         tracks_s.draw(screen)
+
         
         player_s.update(cam.x, cam.y)
         player_s.draw(screen)
+
+
 
         traffic_s.update(cam.x, cam.y)
         traffic_s.draw(screen)
@@ -168,11 +197,36 @@ def main():
         if (bounds.breaking(car.x+CENTER_W, car.y+CENTER_H) == True):
             bound_alert_s.update()
             bound_alert_s.draw(screen)
+
         if (target.timeleft == 0):
             timer_alert_s.draw(screen)
             car.speed = 0
             text_score = font.render('Final Score: ' + str(target.score), 1, (224, 16, 16))
             textpos_score = text_fps.get_rect(centery=CENTER_H+56, centerx=CENTER_W-20)
+
+        celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
+        if int((target.timeleft / 60) % 60) % 3 == 0 or celular_alert.visibility is True:
+            celular_alert.visibility = True
+            celular_s.draw(screen)
+            if(celular_alert.score):
+                celular_alert.score = False
+                target.score += 5
+
+        stop_alert.stop_car(car.speed)
+        if(int((target.timeleft / 60) % 60) % 15 == 0 or stop_alert.visibility is True):
+            stop_alert.visibility = True
+            stop_s.draw(screen)
+            if (stop_alert.score):
+                stop_alert.score = False
+                target.score += 5
+
+
+
+
+
+
+
+
         if (info.visibility == True):
             menu_alert_s.draw(screen)
             
