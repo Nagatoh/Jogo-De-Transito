@@ -1,9 +1,7 @@
-import pygame
-from pygame.locals import *
-from game import *
-from functions import *
 from sys import exit
-import os
+
+from functions import *
+from game import *
 
 
 class Menu:
@@ -48,7 +46,7 @@ class Menu:
 
         self.pressed = False
 
-        self.fullscreen = False
+        self.fullscreen = True
 
     def set_fullscreen(self):
         pressed_keys = pygame.key.get_pressed()
@@ -56,13 +54,15 @@ class Menu:
         if pressed_keys[K_LALT] and pressed_keys[K_RETURN]:
             self.fullscreen = not self.fullscreen
 
-            if self.fullscreen: screen = pygame.display.set_mode((1024,768), FULLSCREEN, 32)
+            if self.fullscreen: screen = pygame.display.set_mode((pygame.display.Info().current_w,
+                                  pygame.display.Info().current_h),
+                                  pygame.FULLSCREEN)
             else: screen = pygame.display.set_mode((1024,768), 0, 32)
 
     def main_menu(self):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('sounds' + os.sep + 'game_music.mp3')
-        pygame.mixer.music.play()
+        #pygame.mixer.music.stop()
+        #pygame.mixer.music.load('sounds' + os.sep + 'game_music.mp3')
+        #pygame.mixer.music.play()
 
         while True:
             for event in pygame.event.get():
@@ -91,7 +91,7 @@ class Menu:
 
                 if self.pressed and not mouse_press[0]:
                     self.game_button = self.game_buttons[1]
-                    pygame.mixer.music.stop()
+                    #pygame.mixer.music.stop()
                     self.select_car_menu()
 
             else: self.game_button = self.game_buttons[0]
@@ -234,9 +234,9 @@ class Menu:
             pygame.display.flip()
 
     def select_car_menu(self):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('sounds' + os.sep + 'select_menu.mp3')
-        pygame.mixer.music.play()
+        #pygame.mixer.music.stop()
+       # pygame.mixer.music.load('sounds' + os.sep + 'select_menu.mp3')
+       # pygame.mixer.music.play()
         
         self.background = load_image('menu_background_2.bmp')
         self.text = load_image('sel_carro.bmp', 2)
@@ -511,8 +511,12 @@ class Menu:
 
 pygame.init()
 
-screen = pygame.display.set_mode((1024,768), 0, 32)
+screen = pygame.display.set_mode((pygame.display.Info().current_w,
+                                  pygame.display.Info().current_h),
+                                  pygame.FULLSCREEN)
 
 pygame.display.set_caption("Test Drive")
 menu = Menu()
-menu.main_menu()
+
+if __name__ == "__main__":
+    menu.main_menu()

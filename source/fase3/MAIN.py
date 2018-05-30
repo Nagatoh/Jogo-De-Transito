@@ -220,13 +220,6 @@ def main():
                 stop_alert.score = False
                 target.score += 5
 
-
-
-
-
-
-
-
         if (info.visibility == True):
             menu_alert_s.draw(screen)
             
@@ -264,7 +257,7 @@ screen = pygame.display.set_mode((pygame.display.Info().current_w,
 
 
 pygame.display.set_caption('Race of Math.')
-pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(True)
 font = pygame.font.Font(None, 24)
 
 CENTER_W =  int(pygame.display.Info().current_w /2)
@@ -276,10 +269,10 @@ background = background.convert_alpha()
 background.fill((26, 26, 26))
 
 #Enter the mainloop.
-main()
+#main()
 
-pygame.quit()
-sys.exit(0)
+#pygame.quit()
+#sys.exit(0)
 
 
 

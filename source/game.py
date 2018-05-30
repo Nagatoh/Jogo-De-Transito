@@ -1,11 +1,5 @@
-import pygame
-from pygame.locals import *
 from sys import exit
-import os
-from math import *
-import time
 from functions import *
-from random import randint
 
 
 def main(screen, car_type, level):
@@ -29,43 +23,45 @@ def main(screen, car_type, level):
                         self.map_images = {'carro_normal': (self.images[0], self.images2[0]),\
                                            'carro_freiando': (self.images[1], self.images2[1]),\
                                            'carro_re': (self.images[2], self.images2[2])}
-
-                        self.image = self.map_images['carro_normal'][game.track - 1]
-                        self.rect = self.image.get_rect()
-                        self.rect.center = self.x, self.y
-                        self.height, self.width = self.rect.height, self.rect.width
+                        if game.track != 3:
+                            print game.track - 1
+                            self.image = self.map_images['carro_normal'][game.track - 1]
+                            print self.image
+                            self.rect = self.image.get_rect()
+                            self.rect.center = self.x, self.y
+                            self.height, self.width = self.rect.height, self.rect.width
                         
 
-                        self.chocks = 0
-                        self.chock_up_key = False
-                        self.chock_down_key = False
-                        self.chock_lado_key = False
+                            self.chocks = 0
+                            self.chock_up_key = False
+                            self.chock_down_key = False
+                            self.chock_lado_key = False
 
-                        self.clock = pygame.time.Clock()
+                            self.clock = pygame.time.Clock()
 
-                        # Criando as variaveis para a movimentacao do carro
+                            # Criando as variaveis para a movimentacao do carro
 
-                        self.rotation_angule = 0.
-                        self.rotation_direction, self.movement_direction = 0, -1
+                            self.rotation_angule = 0.
+                            self.rotation_direction, self.movement_direction = 0, -1
 
-                        self.car_atributes = {'max_speed': (360, 240, 300), 're_speed': (-100, -70, -90),\
-                                              'rotation': (100, 90, 140), 'accel': (2, 1, 3)}
+                            self.car_atributes = {'max_speed': (360, 240, 300), 're_speed': (-100, -70, -90),\
+                                                  'rotation': (100, 90, 140), 'accel': (2, 1, 3)}
 
-                        self.movement_speed = 0
-                        self.rotation_speed = 0
-                        self.max_speed = self.car_atributes['max_speed'][game.car_type - 1]
-                        self.max_speed_reward = self.car_atributes['re_speed'][game.car_type - 1]
-                        self.max_rotation = self.car_atributes['rotation'][game.car_type - 1]
-                        self.accel = self.car_atributes['accel'][game.car_type - 1]
+                            self.movement_speed = 0
+                            self.rotation_speed = 0
+                            self.max_speed = self.car_atributes['max_speed'][game.car_type - 1]
+                            self.max_speed_reward = self.car_atributes['re_speed'][game.car_type - 1]
+                            self.max_rotation = self.car_atributes['rotation'][game.car_type - 1]
+                            self.accel = self.car_atributes['accel'][game.car_type - 1]
 
-                        self.translacoes = [(0, (- self.height / 2)), ((+ self.width / 2),\
-                        (- self.height / 2)), ((- self.width / 2), (- self.height / 2)),\
-                        (0, (+ self.height / 2)), ((+ self.width / 2), (+ self.height / 2)),\
-                        ((- self.width / 2), (+ self.height / 2)), ((-self.width / 2), (-self.height / 6)),\
-                        ((-self.width / 2), (+self.height / 6)), ((+self.width / 2), (-self.height / 6)),\
-                                        ((+self.width / 2), (+self.height / 6))]
+                            self.translacoes = [(0, (- self.height / 2)), ((+ self.width / 2),\
+                            (- self.height / 2)), ((- self.width / 2), (- self.height / 2)),\
+                            (0, (+ self.height / 2)), ((+ self.width / 2), (+ self.height / 2)),\
+                            ((- self.width / 2), (+ self.height / 2)), ((-self.width / 2), (-self.height / 6)),\
+                            ((-self.width / 2), (+self.height / 6)), ((+self.width / 2), (-self.height / 6)),\
+                                            ((+self.width / 2), (+self.height / 6))]
 
-                        self.points = []
+                            self.points = []
 
                         self.sound = pygame.mixer.Sound('sounds' + os.sep + 'batida.wav')
 
@@ -231,8 +227,6 @@ def main(screen, car_type, level):
                                 
                                 #pygame.mixer.misuc.load("nomedamusa.mp3")
                                 #pyagme.mixer.music.play()
-                                
-
 
         class OtherCar:
 
@@ -304,7 +298,6 @@ def main(screen, car_type, level):
                         text = 'Tempo: %1.2f' % self.seconds
                         write_in_screen(text, (255, 255, 255), 20, (10, 10))
 
-
         class Semaforo:
 
                 def __init__(self, seconds):
@@ -332,8 +325,7 @@ def main(screen, car_type, level):
                 def show(self):
                         if not self.finished:
                                 screen.blit(self.image, self.pos)
-                        
-                        
+
         class Game:
 
                 def __init__(self):
@@ -418,13 +410,17 @@ def main(screen, car_type, level):
                         self.semaforo.pos = (200, 380)
                         self.semaforo2 = Semaforo(3)
 
+                def track_03(self):
+                        self.track = 3
+
 
                 def shift_track(self):
                         if self.track == 1:
                                 self.track_02()
                                 return True
                         if self.track == 2:
-                                return False
+                                self.track_03()
+                                return True
                         if self.track == 3:
                                 return False
                         
@@ -550,6 +546,10 @@ def main(screen, car_type, level):
                                         self.chronometer.stop = True
                                         car.movement_direction, car.rotation_direction = 0, 0
                                         return self.box(car, 'lose')
+                        if self.track == 3:
+                            print 'passou'
+                            running = False
+                            main3.main()
 
 
 
@@ -563,8 +563,8 @@ def main(screen, car_type, level):
         width, height = 1024, 768
         resolution = (width, height)
 
-        pygame.mixer.music.load('sounds' + os.sep + 'game_music.mp3')
-        pygame.mixer.music.play()
+        #pygame.mixer.music.load('sounds' + os.sep + 'game_music.mp3')
+        #pygame.mixer.music.play()
 
         # Instanciando os objetos do jogo
         game = Game()
@@ -575,8 +575,10 @@ def main(screen, car_type, level):
         car = Car(game)
 
         fullscreen = False
+        running = True
 
-        while True:
+        while running:
+
                 for event in pygame.event.get():
                         if event.type == QUIT:
                                 exit()
@@ -657,4 +659,5 @@ def main(screen, car_type, level):
                 print mouse
 
                 pygame.display.flip()
+
 
