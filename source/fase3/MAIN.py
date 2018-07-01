@@ -123,8 +123,10 @@ def main():
                     pygame.quit()
                     sys.exit(0)
                 if (keys[K_z]):  # atende ligacao
+                    celular_alert.atender = False
                     celular_alert.atender = True
                     print celular_alert.atender
+
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
@@ -151,11 +153,16 @@ def main():
         text_fps = font.render('FPS: ' + str(int(clock.get_fps())), 1, (224, 16, 16))
         textpos_fps = text_fps.get_rect(centery=25, centerx=60)
 
-        text_score = font.render('Score: ' + str(target.score), 1, (224, 16, 16))
+        text_score = font.render('Pontos na Carteira: ' + str(target.score), 1, (224, 16, 16))
         textpos_score = text_fps.get_rect(centery=45, centerx=60)
 
         text_timer = font.render('Timer: ' + str(int((target.timeleft / 60)/60)) + ":" + str(int((target.timeleft / 60) % 60)), 1, (224, 16, 16))
         textpos_timer = text_fps.get_rect(centery=65, centerx=60)
+
+        text_speed = font.render('Velocidade: ' + str(car.speed), 1, (224, 16, 16))
+        textpos_speed = text_fps.get_rect(centery=85, centerx=60)
+
+
 
 #Render Scene.
         screen.blit(background, (0,0))
@@ -204,21 +211,28 @@ def main():
             text_score = font.render('Final Score: ' + str(target.score), 1, (224, 16, 16))
             textpos_score = text_fps.get_rect(centery=CENTER_H+56, centerx=CENTER_W-20)
 
-        celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
-        if int((target.timeleft / 60) % 60) % 3 == 0 or celular_alert.visibility is True:
-            celular_alert.visibility = True
-            celular_s.draw(screen)
-            if(celular_alert.score):
-                celular_alert.score = False
-                target.score += 5
+        print str(int((target.timeleft / 60))) + 's'
 
-        stop_alert.stop_car(car.speed)
-        if(int((target.timeleft / 60) % 60) % 15 == 0 or stop_alert.visibility is True):
-            stop_alert.visibility = True
-            stop_s.draw(screen)
-            if (stop_alert.score):
-                stop_alert.score = False
-                target.score += 5
+        #celular_alert = leis_transito.CelularAlert()
+        if int((target.timeleft / 60)) > 2:
+            celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
+            if int((target.timeleft / 60) % 60) % 15 == 0 and celular_alert.visibility is False:
+                print 'entrou cel'
+                #celular_alert.visibility = True
+                celular_s.draw(screen)
+                if celular_alert.score is False:
+                    print 'pontuou Cel'
+                    target.score -= 5
+
+            #stop_alert = leis_transito.StopAlert()
+            if int((target.timeleft / 60) % 60) % 15 == 0 and stop_alert.visibility is False:
+                stop_alert.stop_car(car.speed)
+                print 'entrou Pare'
+                stop_s.draw(screen)
+                if stop_alert.score is False:
+                    print 'pontuou pare'
+                    target.score -= 5
+                    stop_alert.score = False
 
         if (info.visibility == True):
             menu_alert_s.draw(screen)
@@ -227,6 +241,7 @@ def main():
         screen.blit(text_fps, textpos_fps)
         screen.blit(text_score, textpos_score)
         screen.blit(text_timer, textpos_timer)
+        screen.blit(text_speed, textpos_speed )
         pygame.display.flip()
 
 #Check collision!!!
@@ -269,10 +284,10 @@ background = background.convert_alpha()
 background.fill((26, 26, 26))
 
 #Enter the mainloop.
-#main()
+main()
 
-#pygame.quit()
-#sys.exit(0)
+pygame.quit()
+sys.exit(0)
 
 
 

@@ -31,7 +31,7 @@ import pygame
 import maps
 from loader import load_image
 
-GRASS_SPEED = 0.715
+GRASS_SPEED = 0.315
 GRASS_GREEN = 75
 CENTER_X = -1
 CENTER_Y = -1

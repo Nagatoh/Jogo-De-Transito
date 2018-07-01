@@ -1,7 +1,9 @@
-from sys import exit
-
-from functions import *
+import pygame
+from pygame.locals import *
 from game import *
+from functions import *
+from sys import exit
+import os
 
 
 class Menu:
