@@ -1,5 +1,10 @@
 from sys import exit
-
+import pygame
+from pygame.locals import *
+import os
+from math import *
+from random import randint
+import time
 from functions import *
 from game import *
 
