@@ -38,6 +38,7 @@ import player
 import timeout
 import tracks
 import traffic
+import time
 # Import game modules.
 from loader import load_image
 
@@ -124,7 +125,6 @@ def main():
                     sys.exit(0)
                 if (keys[K_z]):  # atende ligacao
                     celular_alert.atender = True
-                    print celular_alert.atender
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
@@ -193,6 +193,8 @@ def main():
         pointer_s.update(car.x + CENTER_W, car.y + CENTER_H, target.x, target.y)
         pointer_s.draw(screen)
 
+
+        # stop_alert.updateTimer(time.time())
 #Conditional renders.
         if (bounds.breaking(car.x+CENTER_W, car.y+CENTER_H) == True):
             bound_alert_s.update()
@@ -205,20 +207,41 @@ def main():
             textpos_score = text_fps.get_rect(centery=CENTER_H+56, centerx=CENTER_W-20)
 
         celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
-        if int((target.timeleft / 60) % 60) % 3 == 0 or celular_alert.visibility is True:
+        if (int((target.timeleft / 60) % 60) % 20 == 0):
             celular_alert.visibility = True
+
+        if (target.timeleft > 0 and celular_alert.visibility is True):
             celular_s.draw(screen)
-            if(celular_alert.score):
-                celular_alert.score = False
-                target.score += 5
+            keys = pygame.key.get_pressed()
+            celular_alert.startTimer()
+            if (keys[K_c] and car.speed > 0.4):
+                target.score -= 15
+                celular_alert.visibility = False
+            if (keys[K_c] and car.speed <= 0.4):
+                target.score += 100
+                celular_alert.visibility = False
+            # if (celular_alert.score and keys[K_c]):
+            #     celular_alert.visibility = False
+            #     celular_alert.score = False
+            #     if (car.speed >= 1):
+            #         target.score -= 15
+            #     else:
+            #         target.score += 50
+            if (not celular_alert.cel_time()):
+                target.score -= 100
+                celular_alert.visibility = False
 
         stop_alert.stop_car(car.speed)
-        if(int((target.timeleft / 60) % 60) % 15 == 0 or stop_alert.visibility is True):
-            stop_alert.visibility = True
+        # if (int((target.timeleft / 60) % 60) % 15 == 0):
+        #     stop_alert.visibility = True
+
+        if(target.timeleft > 0 and stop_alert.visibility is True):
             stop_s.draw(screen)
-            if (stop_alert.score):
-                stop_alert.score = False
-                target.score += 5
+            if (car.speed < 0.1):
+                target.score += 15
+                stop_alert.visibility = False
+            else:
+                target.score -= 1
 
         if (info.visibility == True):
             menu_alert_s.draw(screen)
@@ -244,10 +267,6 @@ def main():
 #cria semaforo
 
 
-
-
-
-
 #initialization
 pygame.init()
 
@@ -269,7 +288,7 @@ background = background.convert_alpha()
 background.fill((26, 26, 26))
 
 #Enter the mainloop.
-#main()
+main()
 
 #pygame.quit()
 #sys.exit(0)

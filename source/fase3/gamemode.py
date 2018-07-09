@@ -49,8 +49,9 @@ class Finish(pygame.sprite.Sprite):
 #The player has crashed into another vehicle, deduct some points.
     def car_crash(self):
         if (self.penalty_cool == 0):
-            self.score += CRASH_PENALTY
-            self.penalty_cool = PENALTY_COOL
+            print ('ok')
+            # self.score -= CRASH_PENALTY
+            # self.penalty_cool = PENALTY_COOL
 #Find an adequate point to spawn flag.     
     def generate_finish(self):
         x = randint(0,9)
