@@ -218,27 +218,20 @@ def main():
                 target.score -= 15
                 celular_alert.visibility = False
             if (keys[K_c] and car.speed <= 0.4):
-                target.score += 100
+                target.score += 200
                 celular_alert.visibility = False
-            # if (celular_alert.score and keys[K_c]):
-            #     celular_alert.visibility = False
-            #     celular_alert.score = False
-            #     if (car.speed >= 1):
-            #         target.score -= 15
-            #     else:
-            #         target.score += 50
             if (not celular_alert.cel_time()):
                 target.score -= 100
                 celular_alert.visibility = False
 
         stop_alert.stop_car(car.speed)
-        # if (int((target.timeleft / 60) % 60) % 15 == 0):
-        #     stop_alert.visibility = True
+        if (int((target.timeleft / 60) % 60) % 15 == 0 and car.speed >= 0.1):
+            stop_alert.visibility = True
 
         if(target.timeleft > 0 and stop_alert.visibility is True):
             stop_s.draw(screen)
             if (car.speed < 0.1):
-                target.score += 15
+                target.score += 200
                 stop_alert.visibility = False
             else:
                 target.score -= 1
@@ -256,9 +249,11 @@ def main():
         if pygame.sprite.spritecollide(car, traffic_s, False):
             car.impact()
             target.car_crash()
+            target.score -= 5
 
         if pygame.sprite.spritecollide(car, target_s, True):
             target.claim_flag()
+            target.score += 150
             target.generate_finish()
             target_s.add(target)
             
@@ -288,7 +283,7 @@ background = background.convert_alpha()
 background.fill((26, 26, 26))
 
 #Enter the mainloop.
-main()
+# main()
 
 #pygame.quit()
 #sys.exit(0)
