@@ -105,7 +105,7 @@ class CelularAlert(pygame.sprite.Sprite):
 
     # Se o carro estiver em cima da grama o contador for maior q zero e pressionar Z  = score+5.
     def grass(self, value, speed):
-        print (speed)
+        a = 0
         # self.chron.start(5.0)
         # self.chron.run()
         # if speed <= 0.02 and self.visibility is True and self.chron.seconds > 0.0:
@@ -121,13 +121,12 @@ class CelularAlert(pygame.sprite.Sprite):
         self.chron.start(10.0)
         self.chron.run()
 
+
     def cel_time(self):
         # self.chron.run()
         if self.chron.seconds > 0:
-            # print 'Tsegundos' + str(self.chron.seconds)
             return True
         else:
-            # print 'Fsegundos' + str(self.chron.seconds)
             return False
 
 class StopAlert(pygame.sprite.Sprite):
@@ -157,7 +156,6 @@ class StopAlert(pygame.sprite.Sprite):
         # print str(self.chron.seconds) + 'time pare'
 
         self.chron.run()
-        print (self.chron.seconds)
         if self.chron.seconds == 0.0:
         #     self.visibility = False
             self.score = True
