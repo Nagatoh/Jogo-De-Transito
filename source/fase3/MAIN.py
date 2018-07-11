@@ -52,7 +52,7 @@ def main():
 #initialize objects.
     clock = pygame.time.Clock()
     running = True
-    font = pygame.font.Font(None, 24)
+    font = pygame.font.Font(None, 32)
     car = player.Player()
     cam = camera.Camera()
     target = gamemode.Finish()
@@ -148,13 +148,15 @@ def main():
         cam.set_pos(car.x, car.y)
 
 #Show text data.
-        text_fps = font.render('FPS: ' + str(int(clock.get_fps())), 1, (224, 16, 16))
+
+
+        text_fps = font.render('', 1, (224, 16, 16))
         textpos_fps = text_fps.get_rect(centery=25, centerx=60)
 
-        text_score = font.render('Score: ' + str(target.score), 1, (224, 16, 16))
+        text_score = font.render('Pontuacao: ' + str(target.score), 1, (224, 16, 16))
         textpos_score = text_fps.get_rect(centery=45, centerx=60)
 
-        text_timer = font.render('Timer: ' + str(int((target.timeleft / 60)/60)) + ":" + str(int((target.timeleft / 60) % 60)), 1, (224, 16, 16))
+        text_timer = font.render('Tempo: ' + str(int((target.timeleft / 60)/60)) + ":" + str(int((target.timeleft / 60) % 60)), 1, (224, 16, 16))
         textpos_timer = text_fps.get_rect(centery=65, centerx=60)
 
 #Render Scene.
@@ -203,7 +205,7 @@ def main():
         if (target.timeleft == 0):
             timer_alert_s.draw(screen)
             car.speed = 0
-            text_score = font.render('Final Score: ' + str(target.score), 1, (224, 16, 16))
+            text_score = font.render('Pontuacao Final: ' + str(target.score), 1, (224, 16, 16))
             textpos_score = text_fps.get_rect(centery=CENTER_H+56, centerx=CENTER_W-20)
 
         celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
@@ -232,8 +234,8 @@ def main():
                 celular_alert.visibility = False
 
         stop_alert.stop_car(car.speed)
-        # if (int((target.timeleft / 60) % 60) % 15 == 0):
-        #     stop_alert.visibility = True
+        if (int((target.timeleft / 60) % 60) % 15 == 0):
+            stop_alert.visibility = True
 
         if(target.timeleft > 0 and stop_alert.visibility is True):
             stop_s.draw(screen)
@@ -246,7 +248,8 @@ def main():
         if (info.visibility == True):
             menu_alert_s.draw(screen)
             
-#Blit Blit..       
+#Blit Blit..
+        pygame.draw.rect(screen, (216,216,216), [40,30,200,55])
         screen.blit(text_fps, textpos_fps)
         screen.blit(text_score, textpos_score)
         screen.blit(text_timer, textpos_timer)
