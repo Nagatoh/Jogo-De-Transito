@@ -581,7 +581,7 @@ def main(screen, car_type, level, track):
         if (track == 2):
                 game.track_02()
         if (track == 3):
-                game.track_03()
+                main3.main()
         
         car = Car(game)
 
