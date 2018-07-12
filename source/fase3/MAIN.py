@@ -38,6 +38,9 @@ import player
 import timeout
 import tracks
 import traffic
+
+
+import time
 # Import game modules.
 from loader import load_image
 
@@ -51,7 +54,7 @@ def main():
 #initialize objects.
     clock = pygame.time.Clock()
     running = True
-    font = pygame.font.Font(None, 24)
+    font = pygame.font.Font(None, 32)
     car = player.Player()
     cam = camera.Camera()
     target = gamemode.Finish()
@@ -123,12 +126,13 @@ def main():
                     pygame.quit()
                     sys.exit(0)
                 if (keys[K_z]):  # atende ligacao
-                    celular_alert.atender = False
                     celular_alert.atender = True
-                    print celular_alert.atender
-
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+
+                from source.menu import Menu as menu2
+                aux = menu2()
+                aux.main_menu()
                 running = False
                 break
 
@@ -150,19 +154,16 @@ def main():
         cam.set_pos(car.x, car.y)
 
 #Show text data.
-        text_fps = font.render('FPS: ' + str(int(clock.get_fps())), 1, (224, 16, 16))
+
+
+        text_fps = font.render('', 1, (224, 16, 16))
         textpos_fps = text_fps.get_rect(centery=25, centerx=60)
 
-        text_score = font.render('Pontos na Carteira: ' + str(target.score), 1, (224, 16, 16))
+        text_score = font.render('Pontuacao: ' + str(target.score), 1, (224, 16, 16))
         textpos_score = text_fps.get_rect(centery=45, centerx=60)
 
-        text_timer = font.render('Timer: ' + str(int((target.timeleft / 60)/60)) + ":" + str(int((target.timeleft / 60) % 60)), 1, (224, 16, 16))
+        text_timer = font.render('Tempo: ' + str(int((target.timeleft / 60)/60)) + ":" + str(int((target.timeleft / 60) % 60)), 1, (224, 16, 16))
         textpos_timer = text_fps.get_rect(centery=65, centerx=60)
-
-        text_speed = font.render('Velocidade: ' + str(car.speed), 1, (224, 16, 16))
-        textpos_speed = text_fps.get_rect(centery=85, centerx=60)
-
-
 
 #Render Scene.
         screen.blit(background, (0,0))
@@ -200,6 +201,8 @@ def main():
         pointer_s.update(car.x + CENTER_W, car.y + CENTER_H, target.x, target.y)
         pointer_s.draw(screen)
 
+
+        # stop_alert.updateTimer(time.time())
 #Conditional renders.
         if (bounds.breaking(car.x+CENTER_W, car.y+CENTER_H) == True):
             bound_alert_s.update()
@@ -208,49 +211,58 @@ def main():
         if (target.timeleft == 0):
             timer_alert_s.draw(screen)
             car.speed = 0
-            text_score = font.render('Final Score: ' + str(target.score), 1, (224, 16, 16))
+            text_score = font.render('Pontuacao Final: ' + str(target.score), 1, (224, 16, 16))
             textpos_score = text_fps.get_rect(centery=CENTER_H+56, centerx=CENTER_W-20)
 
-        print str(int((target.timeleft / 60))) + 's'
+        celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
+        if (int((target.timeleft / 60) % 60) % 20 == 0):
+            celular_alert.visibility = True
 
-        #celular_alert = leis_transito.CelularAlert()
-        if int((target.timeleft / 60)) > 2:
-            celular_alert.grass(screen.get_at(((int(CENTER_W - 5), int(CENTER_H - 5)))).g, car.speed)
-            if int((target.timeleft / 60) % 60) % 15 == 0 and celular_alert.visibility is False:
-                print 'entrou cel'
-                #celular_alert.visibility = True
-                celular_s.draw(screen)
-                if celular_alert.score is False:
-                    print 'pontuou Cel'
-                    target.score -= 5
+        if (target.timeleft > 0 and celular_alert.visibility is True):
+            celular_s.draw(screen)
+            keys = pygame.key.get_pressed()
+            celular_alert.startTimer()
+            if (keys[K_c] and car.speed > 0.4):
+                target.score -= 15
+                celular_alert.visibility = False
+            if (keys[K_c] and car.speed <= 0.4):
+                target.score += 200
+                celular_alert.visibility = False
+            if (not celular_alert.cel_time()):
+                target.score -= 100
+                celular_alert.visibility = False
 
-            #stop_alert = leis_transito.StopAlert()
-            if int((target.timeleft / 60) % 60) % 15 == 0 and stop_alert.visibility is False:
-                stop_alert.stop_car(car.speed)
-                print 'entrou Pare'
-                stop_s.draw(screen)
-                if stop_alert.score is False:
-                    print 'pontuou pare'
-                    target.score -= 5
-                    stop_alert.score = False
+        stop_alert.stop_car(car.speed)
+        if (int((target.timeleft / 60) % 60) % 15 == 0 and car.speed >= 0.1):
+            stop_alert.visibility = True
+
+        if(target.timeleft > 0 and stop_alert.visibility is True):
+            stop_s.draw(screen)
+            if (car.speed < 0.1):
+                target.score += 200
+                stop_alert.visibility = False
+            else:
+                target.score -= 1
 
         if (info.visibility == True):
             menu_alert_s.draw(screen)
             
-#Blit Blit..       
+#Blit Blit..
+        pygame.draw.rect(screen, (216,216,216), [40,30,200,55])
         screen.blit(text_fps, textpos_fps)
         screen.blit(text_score, textpos_score)
         screen.blit(text_timer, textpos_timer)
-        screen.blit(text_speed, textpos_speed )
         pygame.display.flip()
 
 #Check collision!!!
         if pygame.sprite.spritecollide(car, traffic_s, False):
             car.impact()
             target.car_crash()
+            target.score -= 5
 
         if pygame.sprite.spritecollide(car, target_s, True):
             target.claim_flag()
+            target.score += 150
             target.generate_finish()
             target_s.add(target)
             
@@ -259,24 +271,27 @@ def main():
 #cria semaforo
 
 
-
-
-
-
 #initialization
 pygame.init()
-
+print pygame.display.Info().current_w
+print pygame.display.Info().current_h
+'''
 screen = pygame.display.set_mode((pygame.display.Info().current_w,
                                   pygame.display.Info().current_h),
                                   pygame.FULLSCREEN)
+'''
+screen = pygame.display.set_mode((1024, 768), pygame.FULLSCREEN)
 
 
 pygame.display.set_caption('Race of Math.')
 pygame.mouse.set_visible(True)
 font = pygame.font.Font(None, 24)
-
+CENTER_W =  int(1024/2)
+CENTER_H =  int(768/2)
+'''
 CENTER_W =  int(pygame.display.Info().current_w /2)
 CENTER_H =  int(pygame.display.Info().current_h /2)
+'''
 
 #new background surface
 background = pygame.Surface(screen.get_size())
@@ -284,10 +299,10 @@ background = background.convert_alpha()
 background.fill((26, 26, 26))
 
 #Enter the mainloop.
-main()
+#main()
 
-pygame.quit()
-sys.exit(0)
+#pygame.quit()
+#sys.exit(0)
 
 
 

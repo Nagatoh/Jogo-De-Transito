@@ -61,7 +61,6 @@ class Semaforo:
         self.chron.set_time()
         self.finished = False
         self.opened = False
-        print seconds
 
     def abre_semaforo(self):
         self.chron.run()
@@ -106,26 +105,28 @@ class CelularAlert(pygame.sprite.Sprite):
 
     # Se o carro estiver em cima da grama o contador for maior q zero e pressionar Z  = score+5.
     def grass(self, value, speed):
-        self.chron.start(5.0)
-        self.chron.run()
-        if speed <= 0.02 and self.visibility is True and self.chron.seconds > 0.0:
-            self.visibility = False
-            self.atender = False
-            print 'aqui2'
-            self.score = True
+        a = 0
+        # self.chron.start(5.0)
+        # self.chron.run()
+        # if speed <= 0.02 and self.visibility is True and self.chron.seconds > 0.0:
+        #     self.visibility = False
+        #     self.atender = False
+        #     self.score = True
+        #
+        #     if self.chron.seconds == 0:
+        #         self.score = False
+        #         self.visibility = False
 
-            if self.chron.seconds == 0:
-                self.score = False
-                self.visibility = False
-                print 'ali'
+    def startTimer(self):
+        self.chron.start(10.0)
+        self.chron.run()
+
 
     def cel_time(self):
-        self.chron.run()
+        # self.chron.run()
         if self.chron.seconds > 0:
-            print 'Tsegundos' + str(self.chron.seconds)
             return True
         else:
-            print 'Fsegundos' + str(self.chron.seconds)
             return False
 
 class StopAlert(pygame.sprite.Sprite):
@@ -138,41 +139,36 @@ class StopAlert(pygame.sprite.Sprite):
         self.y = 550
         self.rect.topleft = self.x, self.y
         self.chron = Chronometer()
-        self.chron.start(5.0)
+
+        self.start_time = 0
+        self.current_time = 0
+        self.startedCount = False
+
+        self.chron.start(15.0)
         self.chron.set_time()
         self.visibility = False
         self.score = True
 
     # Se o Carro Atingir velocidade 0 score +2
     def stop_car(self, speed):
-        print 'Score:'+str(self.score)
-        print 'Seconds:'+str(self.chron.seconds)
-        print str(self.chron.seconds) + 'time pare'
+        # print 'Score:'+str(self.score)
+        # print 'Seconds:'+str(self.chron.seconds)
+        # print str(self.chron.seconds) + 'time pare'
 
         self.chron.run()
-
-        if speed <= 0.01 and self.visibility is True and self.chron.seconds > 0.0:
-            self.visibility = False
-            print 'aqui3'
-            print self.visibility
-            self.score = True
-
         if self.chron.seconds == 0.0:
-            self.score = False
-            self.visibility = False
-            self.chron.start(5.0)
-            print 'ali'
+        #     self.visibility = False
+            self.score = True
+        #
+        # if self.chron.seconds == 0.0:
+        #     self.score = False
+        #     self.visibility = False
+        #     self.chron.start(15.0)
+
 
     def stop_time(self):
         self.chron.run()
         if self.chron.seconds > 0:
-            print 'Tsegundos' + str(self.chron.seconds)
             return True
         else:
-            print 'Fsegundos' + str(self.chron.seconds)
             return False
-
-
-
-
-

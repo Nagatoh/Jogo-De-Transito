@@ -1,31 +1,35 @@
+from sys import exit
 import pygame
 from pygame.locals import *
-from game import *
-from functions import *
-from sys import exit
 import os
+from math import *
+from random import randint
+import time
+from functions import *
+from game import *
 
+pygame.init()
 
 class Menu:
     def __init__(self):
         self.background = load_image('menu_background.bmp')
-
-        self.game_buttons = load_image('novo_jogo.png', 2, [((x,0),(186,76))\
-                                             for x in xrange(0, 558, 186)])
+        #test agora
+        self.display_width = 1024
+        self.display_height = 768
+        self.gameDisplay = pygame.display.set_mode((1024, 768), pygame.FULLSCREEN)
+        self.black = (0, 0, 0)
+        self.white = (255, 255, 255)
+        self.red = (200, 0, 0)
+        self.green = (0, 200, 0)
+        self.block_color = (53,115,255)
+        self.bright_red = (255, 0, 0)
+        self.bright_green = (0, 255, 0)
+        self.track_selected = None
+        #test agora
 
         self.game_level = None
+
         self.car_type = 1
-
-        self.game_button = self.game_buttons[0]
-        self.game_size = self.game_button.get_size()
-        self.game_pos = (35, 405)
-
-        self.credits_buttons = load_image('creditos.png', 2, [((x,0),(140,70))\
-                                             for x in xrange(0, 420, 140)])
-
-        self.credits_buttton = self.credits_buttons[0]
-        self.credits_size = self.credits_buttton.get_size()
-        self.credits_pos = (570, 566)
 
         self.help_buttons = load_image('ajuda.png', 2, [((x,0),(26,118))\
                                              for x in xrange(0, 78, 26)])
@@ -38,7 +42,6 @@ class Menu:
         self.exit_button = self.exit_buttons[0]
         self.exit_size = self.exit_button.get_size()
         self.exit_pos = (228, 125)
-
 
         self.back_buttons = load_image('voltar.png', 2, [((0,y),(134,36))\
                                              for y in xrange(0, 108, 36)])
@@ -61,6 +64,34 @@ class Menu:
                                   pygame.FULLSCREEN)
             else: screen = pygame.display.set_mode((1024,768), 0, 32)
 
+    #defs inseridas para teste
+    def text_objects(self,text, font):
+        textSurface = font.render(text, True, self.black)
+        return textSurface, textSurface.get_rect()
+
+    def button(self,msg, x, y, w, h, ic, ac, action=None, action2=None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        if x + w > mouse[0] > x and y + h > mouse[1] > y:
+            pygame.draw.rect(self.gameDisplay, ac, (x, y, w, h))
+
+            if click[0] == 1 and action != None:
+                action()
+            if click[0] == 1 and action2 != None:
+                action2()
+        else:
+            pygame.draw.rect(self.gameDisplay, ic, (x, y, w, h))
+
+
+
+
+
+        smallText = pygame.font.SysFont("comicsansms", 20)
+        textSurf, textRect = self.text_objects(msg, smallText)
+        textRect.center = ((x + (w / 2)), (y + (h / 2)))
+        self.gameDisplay.blit(textSurf, textRect)
+    #fim defs
+
     def main_menu(self):
         #pygame.mixer.music.stop()
         #pygame.mixer.music.load('sounds' + os.sep + 'game_music.mp3')
@@ -70,131 +101,19 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     exit()
-
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_press = pygame.mouse.get_pressed()
             
             self.set_fullscreen()
 
-            self.background = load_image('menu_background.bmp')
-            screen.blit(self.background, (0, 0))
-                    
-
-            # Verifica se os botoes esta sendo pressionados e muda as imagens
+            self.gameDisplay.fill(self.white)
+            largeText = pygame.font.Font('freesansbold.ttf', 115)
+            TextSurf, TextRect = self.text_objects("Test Drive", largeText)
+            TextRect.center = ((self.display_width / 2), (self.display_height / 2))
+            self.gameDisplay.blit(TextSurf, TextRect)
             # -Novo jogo
-            if self.game_pos[0] <= mouse_pos[0] <= self.game_pos[0] + self.game_size[0]\
-            and self.game_pos[1] <= mouse_pos[1] <= self.game_pos[1] + self.game_size[1]:
-
-                self.game_button = self.game_buttons[1]
-
-                if mouse_press[0]:
-                    self.game_button = self.game_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.game_button = self.game_buttons[1]
-                    #pygame.mixer.music.stop()
-                    self.select_car_menu()
-
-            else: self.game_button = self.game_buttons[0]
-
-            # -Creditos
-            if self.credits_pos[0] <= mouse_pos[0] <= self.credits_pos[0] + self.credits_size[0]\
-            and self.credits_pos[1] <= mouse_pos[1] <= self.credits_pos[1] + self.credits_size[1]:
-
-                self.credits_button = self.credits_buttons[1]
-
-                if mouse_press[0]:
-                    self.credits_button = self.credits_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.credits_button = self.credits_buttons[1]
-                    self.credits_menu()
-
-            else: self.credits_button = self.credits_buttons[0]
-
-            # -Ajuda
-            if self.help_pos[0] <= mouse_pos[0] <= self.help_pos[0] + self.help_size[0]\
-            and self.help_pos[1] <= mouse_pos[1] <= self.help_pos[1] + self.help_size[1]:
-
-                self.help_button = self.help_buttons[1]
-
-                if mouse_press[0]:
-                    self.help_button = self.help_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.help_button = self.help_buttons[1]
-                    self.help_menu()
-
-            else: self.help_button = self.help_buttons[0]
-
-            # -Sair
-            if self.exit_pos[0] <= mouse_pos[0] <= self.exit_pos[0] + self.exit_size[0]\
-            and self.exit_pos[1] <= mouse_pos[1] <= self.exit_pos[1] + self.exit_size[1]:
-
-                self.exit_button = self.exit_buttons[1]
-
-                if mouse_press[0]:
-                    self.exit_button = self.exit_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.exit_button = self.exit_buttons[1]
-                    exit()
-
-            else: self.exit_button = self.exit_buttons[0]
-
-            if not mouse_press[0]:
-                self.pressed = False
-
-            #for button in menu.buttons:
-            screen.blit(self.game_button, self.game_pos)
-            screen.blit(self.credits_button, self.credits_pos)
-            screen.blit(self.help_button, self.help_pos)
-            screen.blit(self.exit_button, self.exit_pos)
-
-            pygame.display.flip()
-
-    def credits_menu(self):        
-        self.background = load_image('menu_background_2.bmp')
-        self.text = load_image('menu_creditos.bmp', 2)
-
-        while True:
-            
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    exit()
-
-            self.set_fullscreen()
-
-            screen.blit(self.background, (0, 0))
-
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_press = pygame.mouse.get_pressed()
-
-            if self.back_pos[0] <= mouse_pos[0] <= self.back_pos[0] + self.back_size[0]\
-            and self.back_pos[1] <= mouse_pos[1] <= self.back_pos[1] + self.back_size[1]:
-                self.back_button = self.back_buttons[1]
-
-                if mouse_press[0]:
-                    self.back_button = self.back_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.back_button = self.back_buttons[1]
-                    return
-
-            else: self.back_button = self.back_buttons[0]
-
-            if not mouse_press[0]:
-                self.pressed = False
-
-            screen.blit(self.text, (0, 0))
-            screen.blit(self.back_button, self.back_pos)
-
-            pygame.display.flip()
+            self.button("Novo Jogo", 250, 450, 100, 50, self.green, self.bright_green,self.select_fase)
+            self.button("Ajuda", 450, 450, 100, 50, self.green, self.bright_green, self.help_menu)
+            self.button("Sair", 650, 450, 100, 50, self.green, self.bright_green, exit)
+            pygame.display.update()
 
     def help_menu(self):
         self.background = load_image('menu_background_2.bmp')
@@ -235,173 +154,44 @@ class Menu:
 
             pygame.display.flip()
 
-    def select_car_menu(self):
-        #pygame.mixer.music.stop()
-       # pygame.mixer.music.load('sounds' + os.sep + 'select_menu.mp3')
-       # pygame.mixer.music.play()
-        
-        self.background = load_image('menu_background_2.bmp')
-        self.text = load_image('sel_carro.bmp', 2)
 
-        self.car_selected = None
-
-        self.list_button1 = load_image('carro1_atributos.png', 2, [((0,y),(445,180))\
-                                                        for y in xrange(0, 540, 180)])
-        self.button1_image = self.list_button1[0]
-        self.button1_pos = (50, 100)
-
-        self.list_button2 = load_image('carro2_atributos.png', 2, [((0,y),(445,180))\
-                                                        for y in xrange(0, 540, 180)])
-        self.button2_image = self.list_button2[0]
-        self.button2_pos = (250, 300)
-
-        self.list_button3 = load_image('carro3_atributos.png', 2, [((0,y),(445,180))\
-                                                        for y in xrange(0, 540, 180)])
-        self.button3_image = self.list_button3[0]
-        self.button3_pos = (450, 500)
-
-        self.advance_images = load_image('avancar.png', 2, [((0,y),(190,48))\
-                                                for y in xrange(0, 144, 48)])
-        self.advance_button = self.advance_images[0]
-        self.advance_size = self.advance_button.get_size()
-        self.advance_pos = (710, 720)
-        
-        self.a_car_size = self.button1_image.get_size()
-        
-        while True:
+    def select_fase(self):
+        intro = True
+        while intro:
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    exit()
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
 
-            self.set_fullscreen()
+            self.gameDisplay.fill(self.white)
+            largeText = pygame.font.Font('freesansbold.ttf', 115)
+            TextSurf, TextRect = self.text_objects("Test Drive", largeText)
+            TextRect.center = ((self.display_width / 2), (self.display_height / 2))
+            self.gameDisplay.blit(TextSurf, TextRect)
 
-            screen.blit(self.background, (0, 0))
+            self.button("Baliza", 150, 450, 100, 50, self.green, self.bright_green, self.define_fase(1),self.select_level_menu)
+            self.button("Trajeto", 350, 450, 100, 50 , self.green, self.bright_green, self.define_fase(2),self.select_level_menu)
+            self.button("Transito", 550, 450, 100, 50, self.green, self.bright_green, self.define_fase(3),self.select_level_menu)
+            self.button("Sair", 750, 450, 100, 50, self.green, self.bright_green, exit)
 
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_press = pygame.mouse.get_pressed()
+            pygame.display.update()
+            #clock.tick(15)
 
-            if self.button1_pos[0] <= mouse_pos[0] <= self.button1_pos[0] + self.a_car_size[0]\
-            and self.button1_pos[1] <= mouse_pos[1] <= self.button1_pos[1] + self.a_car_size[1]:
-                self.button1_image = self.list_button1[1]
-
-                if mouse_press[0]:
-                    self.button1_image = self.list_button1[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.car_selected = 1
-
-            elif self.car_selected == 1:
-                self.button1_image = self.list_button1[1]
-            else:
-                self.button1_image = self.list_button1[0]
+    def define_fase(self,track):
+        self.track_selected = track
 
 
-            if self.button2_pos[0] <= mouse_pos[0] <= self.button2_pos[0] + self.a_car_size[0]\
-            and self.button2_pos[1] <= mouse_pos[1] <= self.button2_pos[1] + self.a_car_size[1]:
-                self.button2_image = self.list_button2[1]
+    def define_nivel(self, dificuldade):
+        self.level_selected = dificuldade
+        if self.level_selected is not None:
+            pygame.mixer.music.stop()
+            print 'track:'+  str(self.track_selected)
+            if main(screen, self.car_type, self.level_selected,self.track_selected) == False:
+                self.main_menu()
 
-                if mouse_press[0]:
-                    self.button2_image = self.list_button2[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.car_selected = 2
-
-            elif self.car_selected == 2:
-                self.button2_image = self.list_button2[1]
-            else:
-                self.button2_image = self.list_button2[0]
-
-
-            if self.button3_pos[0] <= mouse_pos[0] <= self.button3_pos[0] + self.a_car_size[0]\
-            and self.button3_pos[1] <= mouse_pos[1] <= self.button3_pos[1] + self.a_car_size[1]:
-                self.button3_image = self.list_button3[1]
-
-                if mouse_press[0]:
-                    self.button3_image = self.list_button3[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.car_selected = 3
-
-            elif self.car_selected == 3:
-                self.button3_image = self.list_button3[1]
-            else:
-                self.button3_image = self.list_button3[0]
-
-
-            if self.back_pos[0] <= mouse_pos[0] <= self.back_pos[0] + self.back_size[0]\
-            and self.back_pos[1] <= mouse_pos[1] <= self.back_pos[1] + self.back_size[1]:
-                self.back_button = self.back_buttons[1]
-
-                if mouse_press[0]:
-                    self.back_button = self.back_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.back_button = self.back_buttons[1]
-                    return
-
-            else: self.back_button = self.back_buttons[0]
-
-            if self.advance_pos[0] <= mouse_pos[0] <= self.advance_pos[0] + self.advance_size[0]\
-            and self.advance_pos[1] <= mouse_pos[1] <= self.advance_pos[1] + self.advance_size[1]:
-                self.advance_button = self.advance_images[1]
-
-                if mouse_press[0]:
-                    self.advance_button = self.advance_images[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.advance_button = self.advance_images[1]
-                    if self.car_selected is not None:
-                        self.select_level_menu()
-
-            else: self.advance_button = self.advance_images[0]
-
-
-            if not mouse_press[0]:
-                self.pressed = False
-
-
-            screen.blit(self.button1_image, self.button1_pos)
-            screen.blit(self.button2_image, self.button2_pos)
-            screen.blit(self.button3_image, self.button3_pos)
-            screen.blit(self.back_button, self.back_pos)
-            screen.blit(self.advance_button, self.advance_pos)
-            screen.blit(self.text, (0, 0))
-
-            pygame.display.flip()
-
-            
     def select_level_menu(self):
-        self.background = load_image('menu_background_2.bmp')
-        self.text = load_image('sel_nivel.bmp', 2)
-        
-        levels = load_image('niveis.png', 2, [((0,y),(240,98))\
-                                                            for y in xrange(0, 882, 98)])
-
-        level_map = {'easy': 0, 'medium': 3, 'hard': 6}
-
-        easy_image = levels[level_map['easy']]
-        easy_pos = (392, 130)
-
-        medium_image = levels[level_map['medium']]
-        medium_pos = (391, 330)
-
-        hard_image = levels[level_map['hard']]
-        hard_pos = (392, 530)
-
-        self.play_images = load_image('jogar.png', 2, [((0,y),(175,65))\
-                                                for y in xrange(0, 195, 65)])
-        self.play_button = self.advance_images[0]
-        self.play_size = self.advance_button.get_size()
-        self.play_pos = (710, 700)
 
         self.level_selected = None
-        self.pressed = False
-
 
         while True:
             for event in pygame.event.get():
@@ -410,115 +200,29 @@ class Menu:
 
             self.set_fullscreen()
 
-            screen.blit(self.background, (0, 0))
+            self.gameDisplay.fill(self.white)
+            largeText = pygame.font.Font('freesansbold.ttf', 40)
+            TextSurf, TextRect = self.text_objects("Selecionar Dificuldade", largeText)
+            TextRect.center = ((self.display_width / 2), (self.display_height / 2))
+            self.gameDisplay.blit(TextSurf, TextRect)
 
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_press = pygame.mouse.get_pressed()
-
-            if easy_pos[0] <= mouse_pos[0] <= easy_pos[0] + 240\
-            and easy_pos[1] <= mouse_pos[1] <= easy_pos[1] + 98:
-                easy_image = levels[level_map['easy'] + 1]
-
-                if mouse_press[0]:
-                    easy_image = levels[level_map['easy'] + 2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.level_selected = 1
-
-            elif self.level_selected == 1:
-                easy_image = levels[level_map['easy'] + 1]
-            else:
-                easy_image = levels[level_map['easy']]
+            # -Novo jogo
+            self.button("Facil", 250, 450, 100, 50, self.green, self.bright_green, self.define_nivel(1))
+            self.button("Medio", 450, 450, 100, 50, self.green, self.bright_green, self.define_nivel(2))
+            self.button("Dificil", 650, 450, 100, 50, self.green, self.bright_green, self.define_nivel(3))
+            pygame.display.update()
 
 
-            if medium_pos[0] <= mouse_pos[0] <= medium_pos[0] + 240\
-            and medium_pos[1] <= mouse_pos[1] <= medium_pos[1] + 98:
-                medium_image = levels[level_map['medium'] + 1]
 
-                if mouse_press[0]:
-                    medium_image = levels[level_map['medium'] + 2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.level_selected = 2
-
-            elif self.level_selected == 2:
-                medium_image = levels[level_map['medium'] + 1]
-            else:
-                medium_image = levels[level_map['medium']]
-
-            if hard_pos[0] <= mouse_pos[0] <= hard_pos[0] + 240\
-            and hard_pos[1] <= mouse_pos[1] <= hard_pos[1] + 98:
-                hard_image = levels[level_map['hard'] + 1]
-
-                if mouse_press[0]:
-                    hard_image = levels[level_map['hard'] + 2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.level_selected = 3
-
-            elif self.level_selected == 3:
-                hard_image = levels[level_map['hard'] + 1]
-            else:
-                hard_image = levels[level_map['hard']]
-                
-
-            if self.back_pos[0] <= mouse_pos[0] <= self.back_pos[0] + self.back_size[0]\
-            and self.back_pos[1] <= mouse_pos[1] <= self.back_pos[1] + self.back_size[1]:
-                self.back_button = self.back_buttons[1]
-
-                if mouse_press[0]:
-                    self.back_button = self.back_buttons[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.back_button = self.back_buttons[1]
-                    return
-
-            else: self.back_button = self.back_buttons[0]
-
-            if self.play_pos[0] <= mouse_pos[0] <= self.play_pos[0] + self.play_size[0]\
-            and self.play_pos[1] <= mouse_pos[1] <= self.play_pos[1] + self.play_size[1]:
-                self.play_button = self.play_images[1]
-
-                if mouse_press[0]:
-                    self.play_button = self.play_images[2]
-                    self.pressed = True
-
-                if self.pressed and not mouse_press[0]:
-                    self.play_button = self.play_images[1]
-                    if self.level_selected is not None:
-                        pygame.mixer.music.stop()
-                        if main(screen, self.car_selected, self.level_selected) == False:
-                            self.main_menu()
-
-            else: self.play_button = self.play_images[0]
-
-
-            if not mouse_press[0]:
-                self.pressed = False
-
-
-            screen.blit(easy_image, easy_pos)
-            screen.blit(medium_image, medium_pos)
-            screen.blit(hard_image, hard_pos)
-            screen.blit(self.back_button, self.back_pos)
-            screen.blit(self.play_button, self.play_pos)
-            screen.blit(self.text, (0, 0))
-
-            pygame.display.flip()
-
-
-pygame.init()
 
 screen = pygame.display.set_mode((pygame.display.Info().current_w,
                                   pygame.display.Info().current_h),
                                   pygame.FULLSCREEN)
 
 pygame.display.set_caption("Test Drive")
-menu = Menu()
+
 
 if __name__ == "__main__":
+    menu = Menu()
     menu.main_menu()
+

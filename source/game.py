@@ -1,12 +1,12 @@
+from sys import exit
 import pygame
 from pygame.locals import *
-from sys import exit
 import os
-from math import *
-import time
-from functions import *
-from random import randint
 import fase3.MAIN as main3
+from math import *
+from random import randint
+from functions import *
+import time
 
 def main(screen, car_type, level):
 
