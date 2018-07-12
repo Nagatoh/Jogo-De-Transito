@@ -8,7 +8,7 @@ from random import randint
 from functions import *
 import time
 
-def main(screen, car_type, level):
+def main(screen, car_type, level, track):
 
         class Car:
 
